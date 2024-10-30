@@ -232,12 +232,7 @@ int main(int argc, char* argv[]) {
         SDL_Delay(16);
         int currentTime = SDL_GetTicks();
         if (currentTime - lastUpdate >= updateInterval) {
-<<<<<<< HEAD
-=======
-            // Update whatever needs updating each second
->>>>>>> 5f9ddfbcef32230a466ae1998b692ffb4b16c0ab
             timeCounter++;
-
             lastUpdate = currentTime;  // Reset last update time
         }
     }
