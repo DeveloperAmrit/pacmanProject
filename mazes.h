@@ -24,7 +24,7 @@ extern int maze3[HEIGHT3][WIDTH3];
 
 #define WIDTH4 20
 #define HEIGHT4 15
-#define MAZE4_START_X 13
+#define MAZE4_START_X 12
 #define MAZE4_START_Y 10
 extern int maze4[HEIGHT4][WIDTH4];
 
