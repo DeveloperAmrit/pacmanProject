@@ -2,11 +2,11 @@
 #include "mazes.h"
 
 // chnange map
-#define WIDTH WIDTH6
-#define HEIGHT HEIGHT6
-#define maze maze6
-int pacmanX =  MAZE6_START_X;
-int pacmanY = MAZE6_START_Y;
+#define WIDTH WIDTH5
+#define HEIGHT HEIGHT5
+#define maze maze5
+int pacmanX = MAZE5_START_X;
+int pacmanY = MAZE5_START_Y;
 
 
 #define TILE_SIZE 20
@@ -41,7 +41,7 @@ void renderPacman(SDL_Renderer* renderer) {
     pacmanTile.w = TILE_SIZE;
     pacmanTile.h = TILE_SIZE;
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);  
+    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
     SDL_RenderFillRect(renderer, &pacmanTile);
 }
 
@@ -54,8 +54,8 @@ int dy = 0;
 
 void updatePacmanPosition() {
     if (speedCounter <= 0) {
-        int newX = pacmanX+dx;
-        int newY = pacmanY+dy;
+        int newX = pacmanX + dx;
+        int newY = pacmanY + dy;
         if (newX >= 0 && newX < WIDTH && newY >= 0 && newY < HEIGHT && maze[newY][newX] != 1) {
             pacmanX = newX;
             pacmanY = newY;
@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
             }
         }
         updatePacmanPosition();
-        
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
         SDL_RenderClear(renderer);
