@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
+
+// tile size
+#define TILE_SIZE 20
 
 // chnange map
 #define WIDTH WIDTH6
@@ -14,6 +18,10 @@ int pacmanX = MAZE6_START_X;
 int pacmanY = MAZE6_START_Y;
 
 // global variables
+// window 
+int width = WIDTH * TILE_SIZE;
+int height = HEIGHT * TILE_SIZE + 24;
+
 // speed and movement
 #define speed 7
 int speedCounter = speed;
@@ -22,25 +30,23 @@ int dy = 0;
 // time
 int timeCounter = 0;
 
-// tile size
-#define TILE_SIZE 20
 
 // dots
 #define smallDotRadius 1
-SDL_Color dotColor = {200, 200, 200, 200};
+SDL_Color dotColor = { 200, 200, 200, 200 };
 
 int ABTAS = -1; // availableBlackTilesAtSpawn
 
-void renderTexture(SDL_Renderer *renderer, int x, int y, SDL_Texture *Texture, int angle)
+void renderTexture(SDL_Renderer* renderer, int x, int y, SDL_Texture* Texture, int angle)
 {
-    SDL_Rect Rect = {x, y, TILE_SIZE, TILE_SIZE};
+    SDL_Rect Rect = { x, y, TILE_SIZE, TILE_SIZE };
     SDL_RenderCopyEx(renderer, Texture, NULL, &Rect, angle, NULL, SDL_FLIP_NONE);
 }
 
-void drawItem(SDL_Renderer *renderer, int x, int y, int radius, SDL_Color color)
+void drawItem(SDL_Renderer* renderer, int x, int y, int radius, SDL_Color color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-    SDL_Rect dotRect = {x - radius, y - radius, 2 * radius, 2 * radius};
+    SDL_Rect dotRect = { x - radius, y - radius, 2 * radius, 2 * radius };
     SDL_RenderFillRect(renderer, &dotRect);
 }
 
@@ -58,7 +64,7 @@ void calculateABTAS()
     }
 }
 
-void randomItemPlacer(int total, int value, int *restrictedValues, int n_r)
+void randomItemPlacer(int total, int value, int* restrictedValues, int n_r)
 {
     for (int z = 0; z < total; z++)
     {
@@ -107,17 +113,30 @@ void calculatePoint()
     {
         maze[pacmanY][pacmanX] = 0;
         points++;
-        printf("\n%d", points);
     }
     else if (maze[pacmanY][pacmanX] == 3)
     {
         maze[pacmanY][pacmanX] = 0;
         points += 10;
-        printf("\n%d", points);
     }
 }
 
-void renderMaze(SDL_Renderer *renderer, SDL_Texture *cherryTexture)
+void showPoint(SDL_Renderer* renderer,int score,int x,int y) {
+    TTF_Font* textFont = TTF_OpenFont("C:/SDL2_libraries_/fontsttf/Roboto/Roboto-Regular.ttf",16);
+    SDL_Color fontColor = { 255,255,255,255 };
+    char scoreText[20];
+    snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
+
+    SDL_Surface* textSurface = TTF_RenderText_Solid(textFont, scoreText, fontColor);
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+
+    SDL_Rect textRect = { x,y,textSurface->w,textSurface->h };
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
+}
+
+void renderMaze(SDL_Renderer* renderer, SDL_Texture* cherryTexture)
 {
     for (int row = 0; row < HEIGHT; row++)
     {
@@ -152,7 +171,7 @@ void renderMaze(SDL_Renderer *renderer, SDL_Texture *cherryTexture)
     }
 }
 
-void renderPacman(SDL_Renderer *renderer, SDL_Texture *pacmanOMTexture, SDL_Texture *pacmanCMTexture)
+void renderPacman(SDL_Renderer* renderer, SDL_Texture* pacmanOMTexture, SDL_Texture* pacmanCMTexture)
 {
     SDL_Rect pacmanTile;
     pacmanTile.x = pacmanX * TILE_SIZE;
@@ -222,31 +241,33 @@ void setDirection(int direction)
     }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     srand(time(0));
     SDL_Init(SDL_INIT_VIDEO);
+    IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+    TTF_Init();
 
-    SDL_Window *window = SDL_CreateWindow("PacmanMaze", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, TILE_SIZE * WIDTH, TILE_SIZE * HEIGHT, SDL_WINDOW_SHOWN);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Window* window = SDL_CreateWindow("PacmanMaze", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // loading media
-    SDL_Surface *cherrySurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmancherry.png");
-    SDL_Texture *cherryTexture = SDL_CreateTextureFromSurface(renderer, cherrySurface);
+    SDL_Surface* cherrySurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmancherry.png");
+    SDL_Texture* cherryTexture = SDL_CreateTextureFromSurface(renderer, cherrySurface);
     SDL_FreeSurface(cherrySurface);
 
-    SDL_Surface *pacmanOMSurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacman1.png");
-    SDL_Texture *pacmanOMTexture = SDL_CreateTextureFromSurface(renderer, cherrySurface);
+    SDL_Surface* pacmanOMSurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacman1.png");
+    SDL_Texture* pacmanOMTexture = SDL_CreateTextureFromSurface(renderer, cherrySurface);
     SDL_FreeSurface(pacmanOMSurface);
 
-    SDL_Surface *pacmanCMSurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacman2.png");
-    SDL_Texture *pacmanCMTexture = SDL_CreateTextureFromSurface(renderer, cherrySurface);
+    SDL_Surface* pacmanCMSurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacman2.png");
+    SDL_Texture* pacmanCMTexture = SDL_CreateTextureFromSurface(renderer, cherrySurface);
     SDL_FreeSurface(pacmanCMSurface);
 
     calculateABTAS();
 
     // for big dots
-    int rs1[3] = {1, 0, 3};
+    int rs1[3] = { 1, 0, 3 };
     randomItemPlacer(HEIGHT * WIDTH / 90, 3, rs1, 3);
 
     // time counter
@@ -289,6 +310,7 @@ int main(int argc, char *argv[])
         renderMaze(renderer, cherryTexture);
         renderPacman(renderer, pacmanOMTexture, pacmanCMTexture);
         calculatePoint();
+        showPoint(renderer, points, 10, HEIGHT * TILE_SIZE);
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
         int currentTime = SDL_GetTicks();
