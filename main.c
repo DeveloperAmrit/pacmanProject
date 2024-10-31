@@ -257,11 +257,11 @@ int main(int argc, char* argv[])
     SDL_FreeSurface(cherrySurface);
 
     SDL_Surface* pacmanOMSurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacman1.png");
-    SDL_Texture* pacmanOMTexture = SDL_CreateTextureFromSurface(renderer, cherrySurface);
+    SDL_Texture* pacmanOMTexture = SDL_CreateTextureFromSurface(renderer, pacmanOMSurface);
     SDL_FreeSurface(pacmanOMSurface);
 
     SDL_Surface* pacmanCMSurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacman2.png");
-    SDL_Texture* pacmanCMTexture = SDL_CreateTextureFromSurface(renderer, cherrySurface);
+    SDL_Texture* pacmanCMTexture = SDL_CreateTextureFromSurface(renderer, pacmanCMSurface);
     SDL_FreeSurface(pacmanCMSurface);
 
     calculateABTAS();
