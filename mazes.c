@@ -12,8 +12,8 @@ int maze1[HEIGHT1][WIDTH1] = {
     {1, 1, 2, 2, 2, 1, 1, 2, 2, 1},
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 };
-int maze1ghostsX[] = {1,3};
-int maze1ghostsY[] = {3,3};
+int maze1ghostsX[MAZE1_N_GHOSTS] = {1,3};
+int maze1ghostsY[MAZE1_N_GHOSTS] = {3,3};
 
 int maze2[HEIGHT2][WIDTH2] = {
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -25,8 +25,8 @@ int maze2[HEIGHT2][WIDTH2] = {
     {1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1},
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 };
-int maze2ghostsX[] = {3,9,10 };
-int maze2ghostsY[] = {1,1,3 };
+int maze2ghostsX[MAZE2_N_GHOSTS] = {3,9,10 };
+int maze2ghostsY[MAZE2_N_GHOSTS] = {1,1,3 };
 
 int maze3[HEIGHT3][WIDTH3] = {
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -43,8 +43,8 @@ int maze3[HEIGHT3][WIDTH3] = {
     {1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1},
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 };
-int maze3ghostsX[] = { 1,12,12 };
-int maze3ghostsY[] = { 1,2,11 };
+int maze3ghostsX[MAZE3_N_GHOSTS] = { 1,12,12 };
+int maze3ghostsY[MAZE3_N_GHOSTS] = { 1,2,11 };
 
 int maze4[HEIGHT4][WIDTH4] = {
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -63,7 +63,8 @@ int maze4[HEIGHT4][WIDTH4] = {
     {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 };
-int maze4ghostsX[] = {1};
+int maze4ghostsX[MAZE4_N_GHOSTS] = {1,18,1,18};
+int maze4ghostsY[MAZE4_N_GHOSTS] = {1,1,13,13};
 
 
 int maze5[HEIGHT5][WIDTH5] = {
@@ -88,6 +89,8 @@ int maze5[HEIGHT5][WIDTH5] = {
     {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
+int maze5ghostsX[MAZE5_N_GHOSTS] = {1,23,1,23,12};
+int maze5ghostsY[MAZE5_N_GHOSTS] = {1,1,18,18,1};
 
 
 int maze6[HEIGHT6][WIDTH6] = {
@@ -124,3 +127,6 @@ int maze6[HEIGHT6][WIDTH6] = {
     {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
+
+int maze6ghostsX[MAZE6_N_GHOSTS] = { 26,26,1,1,26,21};
+int maze6ghostsY[MAZE6_N_GHOSTS] = { 1,30,30,15,15,25};

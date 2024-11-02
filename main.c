@@ -10,6 +10,8 @@
 
 int main(int argc, char* argv[])
 {
+    runAfterMain();
+
     srand(time(0));
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
@@ -30,6 +32,32 @@ int main(int argc, char* argv[])
     SDL_Surface* pacmanCMSurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacman2.png");
     SDL_Texture* pacmanCMTexture = SDL_CreateTextureFromSurface(renderer, pacmanCMSurface);
     SDL_FreeSurface(pacmanCMSurface);
+
+    SDL_Surface* ghost1Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost1.png");
+    SDL_Texture* ghost1Texture = SDL_CreateTextureFromSurface(renderer, ghost1Surface);
+    SDL_FreeSurface(ghost1Surface);
+
+    SDL_Surface* ghost2Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost2.png");
+    SDL_Texture* ghost2Texture = SDL_CreateTextureFromSurface(renderer, ghost2Surface);
+    SDL_FreeSurface(ghost2Surface);
+
+    SDL_Surface* ghost3Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost3.png");
+    SDL_Texture* ghost3Texture = SDL_CreateTextureFromSurface(renderer, ghost3Surface);
+    SDL_FreeSurface(ghost3Surface);
+
+    SDL_Surface* ghost4Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost4.png");
+    SDL_Texture* ghost4Texture = SDL_CreateTextureFromSurface(renderer, ghost4Surface);
+    SDL_FreeSurface(ghost4Surface);  
+
+    SDL_Surface* ghost5Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost5.png");
+    SDL_Texture* ghost5Texture = SDL_CreateTextureFromSurface(renderer, ghost5Surface);
+    SDL_FreeSurface(ghost5Surface);   
+
+    SDL_Surface* ghost6Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost6.png");
+    SDL_Texture* ghost6Texture = SDL_CreateTextureFromSurface(renderer, ghost6Surface);
+    SDL_FreeSurface(ghost6Surface);
+
+    SDL_Texture* ghoststextures[6] = {ghost1Texture,ghost2Texture,ghost3Texture,ghost4Texture,ghost5Texture,ghost6Texture};
 
     calculateABTAS();
 
@@ -56,27 +84,28 @@ int main(int argc, char* argv[])
                 switch (event.key.keysym.sym)
                 {
                 case SDLK_UP:
-                    setDirection(1);
+                    setDirection(1,&dx,&dy);
                     break;
                 case SDLK_DOWN:
-                    setDirection(2);
+                    setDirection(2,&dx,&dy);
                     break;
                 case SDLK_LEFT:
-                    setDirection(3);
+                    setDirection(3,&dx,&dy);
                     break;
                 case SDLK_RIGHT:
-                    setDirection(4);
+                    setDirection(4,&dx,&dy);
                     break;
                 }
             }
         }
 
         updatePacmanPosition();
-
+        moveGhostRandomly(&ghostsX[0], &ghostsY[0], &gdx, &gdy);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         renderMaze(renderer, cherryTexture);
         renderPacman(renderer, pacmanOMTexture, pacmanCMTexture);
+        renderGhosts(renderer, ghoststextures, NUMOFGHOSTS);
         calculatePoint();
         showPoint(renderer, points, 10, HEIGHT * TILE_SIZE);
         SDL_RenderPresent(renderer);
