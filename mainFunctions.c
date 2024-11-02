@@ -7,11 +7,12 @@
 #include <time.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <string.h>
 
 // externs
 // map
-int pacmanX = MAZE3_START_X;
-int pacmanY = MAZE3_START_Y;
+int pacmanX = MAZE6_START_X;
+int pacmanY = MAZE6_START_Y;
 
 // window dimensions
 int windowWidth = WIDTH * TILE_SIZE;
@@ -34,6 +35,20 @@ int ABTAS = -1;
 // points
 int points = -1;
 
+// ghosts
+int ghostsX[NUMOFGHOSTS];
+int ghostsY[NUMOFGHOSTS];
+int numofghosts = (int)NUMOFGHOSTS;
+int gdx = 1;
+int gdy = 0;
+int ghostSpeedCounter = 0;
+
+// to run just after main
+
+void runAfterMain() {
+    copyArray(ghostsX, maze6ghostsX, (int)NUMOFGHOSTS);
+    copyArray(ghostsY, maze6ghostsY, (int)NUMOFGHOSTS);
+}
 
 // generalised functions
 
@@ -104,6 +119,37 @@ void randomItemPlacer(int total, int value, int* restrictedValues, int lengthOfr
             }
         }
     }
+}
+
+int getDirection(int dx, int dy) {
+    if (dx == 0 && dy == 0) {
+        return 4;
+    }
+    else if (dx == 0) {
+        return (dy == 1) ? 2 : 1;
+    }
+    else if (dy == 0) {
+        return (dx == 1) ? 4 : 3;
+    }
+    return 4;
+}
+
+int getOppositeDirection(int direction) {
+    switch (direction) {
+    case 1:
+        return 2;
+        break;
+    case 2:
+        return 1;
+        break;
+    case 3:
+        return 4;
+        break;
+    case 4:
+        return 3;
+        break;
+    }
+    return 4;
 }
 
 //points calculation
@@ -202,6 +248,13 @@ void renderPacman(SDL_Renderer* renderer, SDL_Texture* pacmanOMTexture, SDL_Text
     }
 }
 
+
+void renderGhosts(SDL_Renderer* renderer,SDL_Texture** arrayOfTextures,int total) {
+    for (int i = 0;i < NUMOFGHOSTS;i++) {
+        renderTexture(renderer, ghostsX[i] * TILE_SIZE, ghostsY[i] * TILE_SIZE, arrayOfTextures[i], 0);
+    }
+}
+
 // pacmand movement
 
 void updatePacmanPosition()
@@ -223,25 +276,77 @@ void updatePacmanPosition()
     }
 }
 
-void setDirection(int direction)
+void setDirection(int direction,int* dx_,int* dy_)
 {
     switch (direction)
     {
     case 1:
-        dx = 0;
-        dy = -1;
+        *dx_ = 0;
+        *dy_ = -1;
         break; // Up
     case 2:
-        dx = 0;
-        dy = 1;
+        *dx_ = 0;
+        *dy_ = 1;
         break; // Down
     case 3:
-        dx = -1;
-        dy = 0;
+        *dx_ = -1;
+        *dy_ = 0;
         break; // Left
     case 4:
-        dx = 1;
-        dy = 0;
+        *dx_ = 1;
+        *dy_ = 0;
         break; // Right
     }
+}
+
+// ghosts movement
+
+void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy) {
+    if (ghostSpeedCounter == ghostSpeed) {
+        int tgdx = 1;
+        int tgdy = 0;
+        int allDirections[4] = { 1,2,3,4 };
+        int validDirections[4] = {1,2,3,4}, nvalid = 0;
+
+        for (int i = 0;i < 4;i++) {
+            setDirection(allDirections[i], &tgdx, &tgdy);
+            if ((0 <= *gy + tgdy) && (*gy + tgdy < HEIGHT) && (0 <= *gx + tgdx) && (*gx + tgdx < WIDTH)) {
+                if (maze[*gy + tgdy][*gx + tgdx] != 1) {
+                    nvalid++;
+                }
+            }
+        }
+        if (nvalid > 1) {
+            nvalid = 0;
+            for (int i = 0;i < 4;i++) {
+                setDirection(allDirections[i], &tgdx, &tgdy);
+                if ((tgdy != -*gdy) && (tgdx != -*gdx)) {       // this condition is rejecting both forward and backward
+                    if ((0 <= *gy + tgdy) && (*gy + tgdy < HEIGHT) && (0 <= *gx + tgdx) && (*gx + tgdx < WIDTH)) {
+                        if (maze[*gy + tgdy][*gx + tgdx] != 1) {
+                            validDirections[nvalid] = allDirections[i];
+                            nvalid++;
+                        }
+                    }
+                    printf("\nAAYA nvalid = %d",nvalid);
+                }
+            }
+            if (nvalid != 0) {
+                int rand_i = randomInt(0, nvalid-1);
+                setDirection(validDirections[rand_i], gdx, gdy);
+                printf("\t(%d + %d,  %d + %d)", *gx, *gdx, *gy, *gdy);
+            }
+        }
+        else{
+            printf("\nONE WAY");
+            *gdx = -*gdx;
+            *gdy = -*gdy;
+        }
+        *gx = *gx + *gdx;
+        *gy = *gy + *gdy;
+        ghostSpeedCounter = 0;
+    }
+    else {
+        ghostSpeedCounter++;
+    }
+
 }
