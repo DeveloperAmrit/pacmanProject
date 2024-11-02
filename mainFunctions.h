@@ -40,9 +40,9 @@ extern int points;
 #define ghostSpeed 9
 extern int ghostsX[NUMOFGHOSTS];
 extern int ghostsY[NUMOFGHOSTS];
-extern int ghostSpeedCounter;
-extern int gdx;
-extern int gdy;
+extern int ghostSpeedCounter[NUMOFGHOSTS];
+extern int gdxarr[NUMOFGHOSTS];
+extern int gdy[NUMOFGHOSTS];
 
 // run just after main
 void runAfterMain();
@@ -68,5 +68,6 @@ void setDirection(int direction, int* dx_, int* dy_);
 
 // ghost movement
 void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy);
+void moveAllGhostsRandomly();
 
 #endif

@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
         }
 
         updatePacmanPosition();
-        moveGhostRandomly(&ghostsX[0], &ghostsY[0], &gdx, &gdy);
+        moveAllGhostsRandomly();
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         renderMaze(renderer, cherryTexture);

@@ -39,15 +39,20 @@ int points = -1;
 int ghostsX[NUMOFGHOSTS];
 int ghostsY[NUMOFGHOSTS];
 int numofghosts = (int)NUMOFGHOSTS;
-int gdx = 1;
-int gdy = 0;
-int ghostSpeedCounter = 0;
+int gdxarr[NUMOFGHOSTS];
+int gdyarr[NUMOFGHOSTS];
+int ghostSpeedCounterarr[NUMOFGHOSTS];
 
 // to run just after main
 
 void runAfterMain() {
     copyArray(ghostsX, maze6ghostsX, (int)NUMOFGHOSTS);
     copyArray(ghostsY, maze6ghostsY, (int)NUMOFGHOSTS);
+    for (int i = 0;i < NUMOFGHOSTS;i++) {
+        gdxarr[i] = 1;
+        gdyarr[i] = 0;
+        ghostSpeedCounterarr[i] = 0;
+    }
 }
 
 // generalised functions
@@ -301,8 +306,8 @@ void setDirection(int direction,int* dx_,int* dy_)
 
 // ghosts movement
 
-void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy) {
-    if (ghostSpeedCounter == ghostSpeed) {
+void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy,int* ghostSpeedCounter) {
+    if (*ghostSpeedCounter == ghostSpeed) {
         int tgdx = 1;
         int tgdy = 0;
         int allDirections[4] = { 1,2,3,4 };
@@ -327,26 +332,32 @@ void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy) {
                             nvalid++;
                         }
                     }
-                    printf("\nAAYA nvalid = %d",nvalid);
+                    //printf("\nAAYA nvalid = %d",nvalid);
                 }
             }
             if (nvalid != 0) {
                 int rand_i = randomInt(0, nvalid-1);
                 setDirection(validDirections[rand_i], gdx, gdy);
-                printf("\t(%d + %d,  %d + %d)", *gx, *gdx, *gy, *gdy);
+                //printf("\t(%d + %d,  %d + %d)", *gx, *gdx, *gy, *gdy);
             }
         }
         else{
-            printf("\nONE WAY");
+            //printf("\nONE WAY");
             *gdx = -*gdx;
             *gdy = -*gdy;
         }
         *gx = *gx + *gdx;
         *gy = *gy + *gdy;
-        ghostSpeedCounter = 0;
+        *ghostSpeedCounter = 0;
     }
     else {
-        ghostSpeedCounter++;
+        *ghostSpeedCounter = *ghostSpeedCounter + 1;
     }
 
+}
+
+void moveAllGhostsRandomly() {
+    for (int i = 0;i < NUMOFGHOSTS;i++) {
+        moveGhostRandomly(&ghostsX[i], &ghostsY[i], &gdxarr[i], &gdyarr[i],&ghostSpeedCounterarr[i]);
+    }
 }
