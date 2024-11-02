@@ -8,16 +8,19 @@
 #define HEIGHT1 10
 #define MAZE1_START_X 7
 #define MAZE1_START_Y 8
+#define MAZE1_N_GHOSTS 2
+extern int maze1ghostsX[MAZE1_N_GHOSTS];
+extern int maze1ghostsY[MAZE1_N_GHOSTS];
 extern int maze1[HEIGHT1][WIDTH1];
 
 #define WIDTH2 12
 #define HEIGHT2 8
-#define MAZE2_START_X 5
+#define MAZE2_START_X 4
 #define MAZE2_START_Y 6
 extern int maze2[HEIGHT2][WIDTH2];
 
 #define WIDTH3 15
-#define HEIGHT3 12
+#define HEIGHT3 13
 #define MAZE3_START_X 6
 #define MAZE3_START_Y 8
 extern int maze3[HEIGHT3][WIDTH3];
