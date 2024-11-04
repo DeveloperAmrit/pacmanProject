@@ -6,9 +6,9 @@
 #define TILE_SIZE 20
 
 // map
-#define WIDTH WIDTH6
-#define HEIGHT HEIGHT6
-#define maze maze6
+#define WIDTH WIDTH5
+#define HEIGHT HEIGHT5
+#define maze maze5
 extern int pacmanX;
 extern int pacmanY;
 
@@ -36,11 +36,12 @@ extern int ABTAS;
 extern int points;
 
 // ghosts
-#define NUMOFGHOSTS MAZE6_N_GHOSTS
-#define ghostSpeed 9
+#define NUMOFGHOSTS MAZE5_N_GHOSTS
+#define ghostSpeed 10
+#define maxdistacnetochase WIDTH*HEIGHT/140
 extern int ghostsX[NUMOFGHOSTS];
 extern int ghostsY[NUMOFGHOSTS];
-extern int ghostSpeedCounter[NUMOFGHOSTS];
+extern int ghostSpeedCounterarr[NUMOFGHOSTS];
 extern int gdxarr[NUMOFGHOSTS];
 extern int gdy[NUMOFGHOSTS];
 
@@ -67,7 +68,10 @@ void updatePacmanPosition();
 void setDirection(int direction, int* dx_, int* dy_);
 
 // ghost movement
-void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy);
-void moveAllGhostsRandomly();
+void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy, int* ghostSpeedCounter);
+void ghostMovement();
+
+// collision
+int isCollided();
 
 #endif

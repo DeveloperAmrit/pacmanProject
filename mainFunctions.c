@@ -11,8 +11,8 @@
 
 // externs
 // map
-int pacmanX = MAZE6_START_X;
-int pacmanY = MAZE6_START_Y;
+int pacmanX = MAZE5_START_X;
+int pacmanY = MAZE5_START_Y;
 
 // window dimensions
 int windowWidth = WIDTH * TILE_SIZE;
@@ -46,8 +46,8 @@ int ghostSpeedCounterarr[NUMOFGHOSTS];
 // to run just after main
 
 void runAfterMain() {
-    copyArray(ghostsX, maze6ghostsX, (int)NUMOFGHOSTS);
-    copyArray(ghostsY, maze6ghostsY, (int)NUMOFGHOSTS);
+    copyArray(ghostsX, maze5ghostsX, (int)NUMOFGHOSTS);
+    copyArray(ghostsY, maze5ghostsY, (int)NUMOFGHOSTS);
     for (int i = 0;i < NUMOFGHOSTS;i++) {
         gdxarr[i] = 1;
         gdyarr[i] = 0;
@@ -356,8 +356,222 @@ void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy,int* ghostSpeedCount
 
 }
 
-void moveAllGhostsRandomly() {
-    for (int i = 0;i < NUMOFGHOSTS;i++) {
-        moveGhostRandomly(&ghostsX[i], &ghostsY[i], &gdxarr[i], &gdyarr[i],&ghostSpeedCounterarr[i]);
+// implementing BFS for chasing pacman
+
+#define VAMR  1000
+#define EQAMR 1000
+
+
+void explore(int node[2], int visited[(int)VAMR][2], int* Vn, int expoqueue[(int)EQAMR][2], int* En) {
+
+    int ix = node[0];
+    int iy = node[1];
+
+    int allDirections[4] = { 1,2,3,4 };
+    int tdx = 1;
+    int tdy = 0;
+
+    //printf("\nAround (%d,%d) we have", ix, iy);
+
+    for (int i = 0;i < 4;i++) {
+        setDirection(allDirections[i], &tdx, &tdy);
+        if ((0 <= iy + tdy) && (iy + tdy < HEIGHT) && (0 <= ix + tdx) && (ix + tdx < WIDTH)) {
+            if (maze[iy + tdy][ix + tdx] != 1) {
+                int alreadyAvInEQ = 0;
+                int alreadyAvInV = 0;
+                for (int i = 0;i < *En;i++) {
+                    if (expoqueue[i][0] == node[0] + tdx && expoqueue[i][1] == node[1] + tdy) {
+                        alreadyAvInEQ = 1;
+                    }
+                }
+                for (int i = 0;i < *Vn;i++) {
+                    if (visited[i][0] == node[0] + tdx && visited[i][1] == node[1] + tdy) {
+                        alreadyAvInV = 1;
+                    }
+                }
+                if (alreadyAvInV == 0) {
+                    visited[*Vn][0] = node[0] + tdx;
+                    visited[*Vn][1] = node[1] + tdy;
+                    *Vn += 1;
+                }
+                if (alreadyAvInEQ == 0) {
+                    expoqueue[*En][0] = node[0] + tdx;
+                    expoqueue[*En][1] = node[1] + tdy;
+                    *En += 1;
+                    //printf("\t(%d,%d)", ix + tdx, iy + tdy);
+                }
+            }
+        }
     }
+}
+
+int findParentOf(int node[2], int visited[(int)VAMR][2],int Vn, int parentNode[2]) {
+    int tdx = 1;
+    int tdy = 0;
+    int allDirections[4] = { 1,2,3,4 };
+
+    int x = node[0];
+    int y = node[1];
+
+    int index = 0;
+    for (int i = 0;i < Vn;i++) {
+        if (visited[i][0] == x && visited[i][1] == y) {
+            index = i;
+            break;
+        }
+    }
+    for (int i = 0;i < 4;i++) {
+        setDirection(allDirections[i], &tdx, &tdy);
+        for (int j = 0;j < index;j++) {
+            if (visited[j][0] == x + tdx && visited[j][1] == y + tdy) {
+                parentNode[0] = x + tdx;
+                parentNode[1] = y + tdy;
+                return 0;
+            }
+        }
+    }
+}
+
+void findFinalPath(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int maze[HEIGHT][WIDTH],int visited[VAMR][2],int Vn, int finalPath[VAMR][2],int* FPn) {
+
+    int path[(int)VAMR][2];
+    int Pn = 0;
+
+    for (int i = 1;i < Vn;i++) {
+        int node[2] = { visited[i][0], visited[i][1] };
+        int pnode[2] = { 0,0 };
+        findParentOf(node, visited, Vn, pnode);
+        //printf("\nParent of (%d,%d) is (%d,%d)", node[0], node[1], pnode[0], pnode[1]);
+
+        int isAlreadyP = 0;
+        for (int j = 0;j < Pn;j++) {
+            if (path[j][0] == pnode[0] && path[j][1] == pnode[1]) {
+                isAlreadyP = 1;
+            }
+        }
+        if (!isAlreadyP) {
+            path[Pn][0] = pnode[0];
+            path[Pn][1] = pnode[1];
+            Pn++;
+        }
+
+    }
+    path[Pn][0] = pacmanX_;
+    path[Pn][1] = pacmanY_;
+    Pn++;
+    /*printf("\nPath = ");
+    for (int i = 0;i < Pn;i++) {
+        printf("(%d,%d),", path[i][0], path[i][1]);
+    }*/
+
+    // 4 nov
+
+    int tempX = path[Pn - 1][0];
+    int tempY = path[Pn - 1][1];
+    finalPath[0][0] = tempX;
+    finalPath[0][1] = tempY;
+    *FPn+=1;
+    int a = Pn - 1;
+    while (1) {
+        for (int i = a;i >= 0;i--) {
+            if (abs(tempX - path[i][0]) + abs(tempY - path[i][1]) == 1) {
+                tempX = path[i][0];
+                tempY = path[i][1];
+                if (tempX == *ghostX && tempY == *ghostY) {
+                    break;
+                }
+                finalPath[*FPn][0] = tempX;
+                finalPath[*FPn][1] = tempY;
+                *FPn += 1;
+                a = i;
+                break;
+            }
+        }
+        if (tempX == *ghostX && tempY == *ghostY) {
+            break;
+        }
+    }
+    reverseArrayRowWise(finalPath, *FPn, 2);
+   /* printf("\nFinalPath = ");
+    for (int i = 0;i < *FPn;i++) {
+        printf("(%d,%d),", finalPath[i][0], finalPath[i][1]);
+    }*/
+
+}
+
+void applyBFS(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int maze[HEIGHT][WIDTH],int finalPath[VAMR][2],int* FPn) {
+
+    int visited[(int)VAMR][2];
+    long int Vn = 0;
+    int expoq[(int)EQAMR][2];
+    long int En = 0;
+
+    expoq[En][0] = *ghostX;
+    expoq[En][1] = *ghostY;
+    En += 1;
+
+    visited[Vn][0] = *ghostX;
+    visited[Vn][1] = *ghostY;
+    Vn += 1;
+
+    for (int i = 0;i < En;i++) {
+        if (En >= EQAMR || Vn >= VAMR) {
+            //printf("limit reached En=%d Vn=%d", En, Vn);
+            break;
+        }
+        explore(expoq[i], visited, &Vn, expoq, &En);
+        if (expoq[i][0] == pacmanX_ && expoq[i][1] == pacmanY_) {
+            //printf("\t GOT IT (%d,%d)", expoq[i][0], expoq[i][1]);
+            
+            findFinalPath(pacmanX_, pacmanY_, ghostX, ghostY, maze, visited, Vn, finalPath, FPn);
+            break;
+        }
+        
+    }
+}
+
+void chasePacman(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int maze[HEIGHT][WIDTH],int* speedCounter) {
+    if (*speedCounter == ghostSpeed) {
+        int finalPath[VAMR][2];
+        int FPn = 0;
+        applyBFS(pacmanX_, pacmanY_, ghostX, ghostY, maze, finalPath, &FPn);
+        *ghostX = finalPath[0][0];
+        *ghostY = finalPath[0][1];
+        //printf("\nchasePacman chala");
+        *speedCounter = 0;
+    }
+    else {
+        *speedCounter += 1;
+    }
+    
+
+}
+
+// ghost movement control
+
+
+void ghostMovement() {
+    for (int i = 0;i < NUMOFGHOSTS;i++) {
+        if (distanceBetweenTwoPoints(pacmanX, pacmanY, ghostsX[i], ghostsY[i]) > maxdistacnetochase) {
+            moveGhostRandomly(&ghostsX[i], &ghostsY[i], &gdxarr[i], &gdyarr[i], &ghostSpeedCounterarr[i]);
+        }
+        else {
+            chasePacman(pacmanX, pacmanY, &ghostsX[i], &ghostsY[i], maze, &ghostSpeedCounterarr[i]);
+        }
+    }
+    //printf("%d", maxdistacnetochase);
+}
+
+
+// collision 
+
+int isCollided() {
+    for (int i = 0;i < NUMOFGHOSTS;i++) {
+        if (ghostsX[i] == pacmanX && ghostsY[i] == pacmanY) {
+            printf("\n%d", points);
+            printf("\nGAME OVER");
+            return 1;
+        }
+    }
+    return 0;
 }

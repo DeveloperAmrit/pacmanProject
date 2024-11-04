@@ -69,6 +69,8 @@ int main(int argc, char* argv[])
     int lastUpdate = SDL_GetTicks(); // Track time of the last update
     int updateInterval = SPEED * 8;
 
+    int a = 0;
+
     SDL_Event event;
     int running = 1;
     while (running)
@@ -100,7 +102,7 @@ int main(int argc, char* argv[])
         }
 
         updatePacmanPosition();
-        moveAllGhostsRandomly();
+        ghostMovement();
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         renderMaze(renderer, cherryTexture);
@@ -109,6 +111,9 @@ int main(int argc, char* argv[])
         calculatePoint();
         showPoint(renderer, points, 10, HEIGHT * TILE_SIZE);
         SDL_RenderPresent(renderer);
+        if (isCollided()) {
+            break;
+        }
         SDL_Delay(16);
         int currentTime = SDL_GetTicks();
         if (currentTime - lastUpdate >= updateInterval)
