@@ -176,7 +176,7 @@ void calculatePoint()
 // rendering
 
 void showPoint(SDL_Renderer* renderer, int score, int x, int y) {
-    TTF_Font* textFont = TTF_OpenFont("C:/SDL2_libraries_/fontsttf/Roboto/Roboto-Regular.ttf", 16);
+    TTF_Font* textFont = TTF_OpenFont("Roboto-Regular.ttf", 16);
     SDL_Color fontColor = { 255,255,255,255 };
     char scoreText[20];
     snprintf(scoreText, sizeof(scoreText), "Score: %d", score);

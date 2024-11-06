@@ -21,39 +21,39 @@ int main(int argc, char* argv[])
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // loading media
-    SDL_Surface* cherrySurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmancherry.png");
+    SDL_Surface* cherrySurface = IMG_Load("pacmancherry.png");
     SDL_Texture* cherryTexture = SDL_CreateTextureFromSurface(renderer, cherrySurface);
     SDL_FreeSurface(cherrySurface);
 
-    SDL_Surface* pacmanOMSurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacman1.png");
+    SDL_Surface* pacmanOMSurface = IMG_Load("pacman1.png");
     SDL_Texture* pacmanOMTexture = SDL_CreateTextureFromSurface(renderer, pacmanOMSurface);
     SDL_FreeSurface(pacmanOMSurface);
 
-    SDL_Surface* pacmanCMSurface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacman2.png");
+    SDL_Surface* pacmanCMSurface = IMG_Load("pacman2.png");
     SDL_Texture* pacmanCMTexture = SDL_CreateTextureFromSurface(renderer, pacmanCMSurface);
     SDL_FreeSurface(pacmanCMSurface);
 
-    SDL_Surface* ghost1Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost1.png");
+    SDL_Surface* ghost1Surface = IMG_Load("pacmanghost1.png");
     SDL_Texture* ghost1Texture = SDL_CreateTextureFromSurface(renderer, ghost1Surface);
     SDL_FreeSurface(ghost1Surface);
 
-    SDL_Surface* ghost2Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost2.png");
+    SDL_Surface* ghost2Surface = IMG_Load("pacmanghost2.png");
     SDL_Texture* ghost2Texture = SDL_CreateTextureFromSurface(renderer, ghost2Surface);
     SDL_FreeSurface(ghost2Surface);
 
-    SDL_Surface* ghost3Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost3.png");
+    SDL_Surface* ghost3Surface = IMG_Load("pacmanghost3.png");
     SDL_Texture* ghost3Texture = SDL_CreateTextureFromSurface(renderer, ghost3Surface);
     SDL_FreeSurface(ghost3Surface);
 
-    SDL_Surface* ghost4Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost4.png");
+    SDL_Surface* ghost4Surface = IMG_Load("pacmanghost4.png");
     SDL_Texture* ghost4Texture = SDL_CreateTextureFromSurface(renderer, ghost4Surface);
     SDL_FreeSurface(ghost4Surface);  
 
-    SDL_Surface* ghost5Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost5.png");
+    SDL_Surface* ghost5Surface = IMG_Load("pacmanghost5.png");
     SDL_Texture* ghost5Texture = SDL_CreateTextureFromSurface(renderer, ghost5Surface);
     SDL_FreeSurface(ghost5Surface);   
 
-    SDL_Surface* ghost6Surface = IMG_Load("C:/Users/Hp/Pictures/Saved Pictures/pacmanghost6.png");
+    SDL_Surface* ghost6Surface = IMG_Load("pacmanghost6.png");
     SDL_Texture* ghost6Texture = SDL_CreateTextureFromSurface(renderer, ghost6Surface);
     SDL_FreeSurface(ghost6Surface);
 
