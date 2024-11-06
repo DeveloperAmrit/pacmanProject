@@ -8,56 +8,17 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <string.h>
+#include "screenchanging.h"
 
-// externs
-// map
-int pacmanX = MAZE5_START_X;
-int pacmanY = MAZE5_START_Y;
-
-// window dimensions
-int windowWidth = WIDTH * TILE_SIZE;
-int windowHeight = HEIGHT * TILE_SIZE + 24;
-
-// speed and movement
-int speedCounter = SPEED;
-int dx = 0;
-int dy = 0;
-
-// time
-int timeCounter = 0;
-
-// point dots
-SDL_Color dotColor = { 200, 200, 200, 200 };
-
-// random function seed
-int ABTAS = -1;
-
-// points
-int points = -1;
-
-// ghosts
-int ghostsX[NUMOFGHOSTS];
-int ghostsY[NUMOFGHOSTS];
-int numofghosts = (int)NUMOFGHOSTS;
-int gdxarr[NUMOFGHOSTS];
-int gdyarr[NUMOFGHOSTS];
-int ghostSpeedCounterarr[NUMOFGHOSTS];
-
-// to run just after main
-
-void runAfterMain() {
-    copyArray(ghostsX, maze5ghostsX, (int)NUMOFGHOSTS);
-    copyArray(ghostsY, maze5ghostsY, (int)NUMOFGHOSTS);
-    for (int i = 0;i < NUMOFGHOSTS;i++) {
-        gdxarr[i] = 1;
-        gdyarr[i] = 0;
-        ghostSpeedCounterarr[i] = 0;
-    }
-}
+int ghostsX[6];
+int ghostsY[6];
+int gdxarr[6];
+int gdyarr[6];
+int ghostSpeedCounterarr[6];
 
 // generalised functions
 
-void renderTexture(SDL_Renderer* renderer, int x, int y, SDL_Texture* Texture, int angle)
+void renderTexture(SDL_Renderer* renderer, int x, int y, SDL_Texture* Texture, int angle, int TILE_SIZE)
 {
     SDL_Rect Rect = { x, y, TILE_SIZE, TILE_SIZE };
     SDL_RenderCopyEx(renderer, Texture, NULL, &Rect, angle, NULL, SDL_FLIP_NONE);
@@ -70,7 +31,7 @@ void drawItem(SDL_Renderer* renderer, int x, int y, int radius, SDL_Color color)
     SDL_RenderFillRect(renderer, &dotRect);
 }
 
-void calculateABTAS()
+void calculateABTAS(int HEIGHT, int WIDTH, int** maze, int* ABTAS)
 {
     for (int i = 0; i < HEIGHT; i++)
     {
@@ -78,18 +39,18 @@ void calculateABTAS()
         {
             if (maze[i][j] != 1)
             {
-                ABTAS++;
+                *ABTAS += 1;
             }
         }
     }
 }
 
 
-void randomItemPlacer(int total, int value, int* restrictedValues, int lengthOfresvalsarr)
+void randomItemPlacer(int total, int value, int* restrictedValues, int lengthOfresvalsarr, int* ABTAS, int HEIGHT, int WIDTH, int** maze)
 {
     for (int z = 0; z < total; z++)
     {
-        int a = randomInt(0, ABTAS);
+        int a = randomInt(0, *ABTAS);
         int b = 0;
         for (int i = 0; i < HEIGHT; i++)
         {
@@ -108,7 +69,7 @@ void randomItemPlacer(int total, int value, int* restrictedValues, int lengthOfr
                     if (b == a)
                     {
                         maze[i][j] = value;
-                        ABTAS--;
+                        *ABTAS-=1;
                         b = -1;
                         break;
                     }
@@ -159,17 +120,17 @@ int getOppositeDirection(int direction) {
 
 //points calculation
 
-void calculatePoint()
+void calculatePoint(int** maze, int WIDTH, int pacmanX, int pacmanY, int* points)
 {
     if (maze[pacmanY][pacmanX] == 2)
     {
         maze[pacmanY][pacmanX] = 0;
-        points++;
+        *points+=1;
     }
     else if (maze[pacmanY][pacmanX] == 3)
     {
         maze[pacmanY][pacmanX] = 0;
-        points += 10;
+        *points += 10;
     }
 }
 
@@ -190,7 +151,7 @@ void showPoint(SDL_Renderer* renderer, int score, int x, int y) {
     SDL_DestroyTexture(textTexture);
 }
 
-void renderMaze(SDL_Renderer* renderer, SDL_Texture* cherryTexture)
+void renderMaze(SDL_Renderer* renderer, SDL_Texture* cherryTexture, int TILE_SIZE, int WIDTH, int HEIGHT, int** maze, int SMALL_DOT_RADIUS, SDL_Color dotColor)
 {
     for (int row = 0; row < HEIGHT; row++)
     {
@@ -215,7 +176,7 @@ void renderMaze(SDL_Renderer* renderer, SDL_Texture* cherryTexture)
 
             if (maze[row][col] == 3)
             {
-                renderTexture(renderer, tile.x, tile.y, cherryTexture, 0);
+                renderTexture(renderer, tile.x, tile.y, cherryTexture, 0, TILE_SIZE);
             }
             else if (maze[row][col] == 2)
             {
@@ -225,7 +186,7 @@ void renderMaze(SDL_Renderer* renderer, SDL_Texture* cherryTexture)
     }
 }
 
-void renderPacman(SDL_Renderer* renderer, SDL_Texture* pacmanOMTexture, SDL_Texture* pacmanCMTexture)
+void renderPacman(SDL_Renderer* renderer, SDL_Texture* pacmanOMTexture, SDL_Texture* pacmanCMTexture, int TILE_SIZE, int pacmanX, int pacmanY, int dx, int dy, int timeCounter)
 {
     SDL_Rect pacmanTile;
     pacmanTile.x = pacmanX * TILE_SIZE;
@@ -245,43 +206,43 @@ void renderPacman(SDL_Renderer* renderer, SDL_Texture* pacmanOMTexture, SDL_Text
     }
     if (timeCounter % 2 == 0)
     {
-        renderTexture(renderer, pacmanTile.x, pacmanTile.y, pacmanOMTexture, angle);
+        renderTexture(renderer, pacmanTile.x, pacmanTile.y, pacmanOMTexture, angle, TILE_SIZE);
     }
     else
     {
-        renderTexture(renderer, pacmanTile.x, pacmanTile.y, pacmanCMTexture, angle);
+        renderTexture(renderer, pacmanTile.x, pacmanTile.y, pacmanCMTexture, angle, TILE_SIZE);
     }
 }
 
 
-void renderGhosts(SDL_Renderer* renderer,SDL_Texture** arrayOfTextures,int total) {
+void renderGhosts(SDL_Renderer* renderer, SDL_Texture** arrayOfTextures, int total, int TILE_SIZE, int NUMOFGHOSTS) {
     for (int i = 0;i < NUMOFGHOSTS;i++) {
-        renderTexture(renderer, ghostsX[i] * TILE_SIZE, ghostsY[i] * TILE_SIZE, arrayOfTextures[i], 0);
+        renderTexture(renderer, ghostsX[i] * TILE_SIZE, ghostsY[i] * TILE_SIZE, arrayOfTextures[i], 0, TILE_SIZE);
     }
 }
 
 // pacmand movement
 
-void updatePacmanPosition()
+void updatePacmanPosition(int HEIGHT, int WIDTH, int** maze, int SPEED, int* speedCounter, int* pacmanX, int* pacmanY, int dx, int dy)
 {
-    if (speedCounter <= 0)
+    if (*speedCounter <= 0)
     {
-        int newX = pacmanX + dx;
-        int newY = pacmanY + dy;
+        int newX = *pacmanX + dx;
+        int newY = *pacmanY + dy;
         if (newX >= 0 && newX < WIDTH && newY >= 0 && newY < HEIGHT && maze[newY][newX] != 1)
         {
-            pacmanX = newX;
-            pacmanY = newY;
+            *pacmanX = newX;
+            *pacmanY = newY;
         }
-        speedCounter = SPEED;
+        *speedCounter = SPEED;
     }
     else
     {
-        speedCounter--;
+        *speedCounter-=1;
     }
 }
 
-void setDirection(int direction,int* dx_,int* dy_)
+void setDirection(int direction, int* dx_, int* dy_)
 {
     switch (direction)
     {
@@ -306,12 +267,12 @@ void setDirection(int direction,int* dx_,int* dy_)
 
 // ghosts movement
 
-void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy,int* ghostSpeedCounter) {
+void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy, int* ghostSpeedCounter, int ghostSpeed, int HEIGHT, int WIDTH, int** maze) {
     if (*ghostSpeedCounter == ghostSpeed) {
         int tgdx = 1;
         int tgdy = 0;
         int allDirections[4] = { 1,2,3,4 };
-        int validDirections[4] = {1,2,3,4}, nvalid = 0;
+        int validDirections[4] = { 1,2,3,4 }, nvalid = 0;
 
         for (int i = 0;i < 4;i++) {
             setDirection(allDirections[i], &tgdx, &tgdy);
@@ -325,7 +286,7 @@ void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy,int* ghostSpeedCount
             nvalid = 0;
             for (int i = 0;i < 4;i++) {
                 setDirection(allDirections[i], &tgdx, &tgdy);
-                if ((*gdy!=0 && tgdy != -*gdy) || (*gdx !=0 && tgdx != -*gdx)) {       // this condition is rejecting backward movement
+                if ((*gdy != 0 && tgdy != -*gdy) || (*gdx != 0 && tgdx != -*gdx)) {       // this condition is rejecting backward movement
                     if ((0 <= *gy + tgdy) && (*gy + tgdy < HEIGHT) && (0 <= *gx + tgdx) && (*gx + tgdx < WIDTH)) {
                         if (maze[*gy + tgdy][*gx + tgdx] != 1) {
                             validDirections[nvalid] = allDirections[i];
@@ -336,12 +297,12 @@ void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy,int* ghostSpeedCount
                 }
             }
             if (nvalid != 0) {
-                int rand_i = randomInt(0, nvalid-1);
+                int rand_i = randomInt(0, nvalid - 1);
                 setDirection(validDirections[rand_i], gdx, gdy);
                 //printf("\t(%d + %d,  %d + %d)", *gx, *gdx, *gy, *gdy);
             }
         }
-        else{
+        else {
             //printf("\nONE WAY");
             *gdx = -*gdx;
             *gdy = -*gdy;
@@ -362,7 +323,7 @@ void moveGhostRandomly(int* gx, int* gy, int* gdx, int* gdy,int* ghostSpeedCount
 #define EQAMR 1000
 
 
-void explore(int node[2], int visited[(int)VAMR][2], int* Vn, int expoqueue[(int)EQAMR][2], int* En) {
+void explore(int node[2], int visited[(int)VAMR][2], int* Vn, int expoqueue[(int)EQAMR][2], int* En, int HEIGHT, int WIDTH, int** maze) {
 
     int ix = node[0];
     int iy = node[1];
@@ -405,7 +366,7 @@ void explore(int node[2], int visited[(int)VAMR][2], int* Vn, int expoqueue[(int
     }
 }
 
-int findParentOf(int node[2], int visited[(int)VAMR][2],int Vn, int parentNode[2]) {
+int findParentOf(int node[2], int visited[(int)VAMR][2], int Vn, int parentNode[2]) {
     int tdx = 1;
     int tdy = 0;
     int allDirections[4] = { 1,2,3,4 };
@@ -432,7 +393,7 @@ int findParentOf(int node[2], int visited[(int)VAMR][2],int Vn, int parentNode[2
     }
 }
 
-void findFinalPath(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int maze[HEIGHT][WIDTH],int visited[VAMR][2],int Vn, int finalPath[VAMR][2],int* FPn) {
+void findFinalPath(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int visited[VAMR][2], int Vn, int finalPath[VAMR][2], int* FPn) {
 
     int path[(int)VAMR][2];
     int Pn = 0;
@@ -470,7 +431,7 @@ void findFinalPath(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int maz
     int tempY = path[Pn - 1][1];
     finalPath[0][0] = tempX;
     finalPath[0][1] = tempY;
-    *FPn+=1;
+    *FPn += 1;
     int a = Pn - 1;
     while (1) {
         for (int i = a;i >= 0;i--) {
@@ -492,14 +453,14 @@ void findFinalPath(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int maz
         }
     }
     reverseArrayRowWise(finalPath, *FPn, 2);
-   /* printf("\nFinalPath = ");
-    for (int i = 0;i < *FPn;i++) {
-        printf("(%d,%d),", finalPath[i][0], finalPath[i][1]);
-    }*/
+    /* printf("\nFinalPath = ");
+     for (int i = 0;i < *FPn;i++) {
+         printf("(%d,%d),", finalPath[i][0], finalPath[i][1]);
+     }*/
 
 }
 
-void applyBFS(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int maze[HEIGHT][WIDTH],int finalPath[VAMR][2],int* FPn) {
+void applyBFS(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int** maze, int finalPath[VAMR][2], int* FPn, int HEIGHT, int WIDTH) {
 
     int visited[(int)VAMR][2];
     long int Vn = 0;
@@ -519,22 +480,22 @@ void applyBFS(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int maze[HEI
             //printf("limit reached En=%d Vn=%d", En, Vn);
             break;
         }
-        explore(expoq[i], visited, &Vn, expoq, &En);
+        explore(expoq[i], visited, &Vn, expoq, &En, HEIGHT, WIDTH, maze);
         if (expoq[i][0] == pacmanX_ && expoq[i][1] == pacmanY_) {
             //printf("\t GOT IT (%d,%d)", expoq[i][0], expoq[i][1]);
-            
-            findFinalPath(pacmanX_, pacmanY_, ghostX, ghostY, maze, visited, Vn, finalPath, FPn);
+
+            findFinalPath(pacmanX_, pacmanY_, ghostX, ghostY, visited, Vn, finalPath, FPn);
             break;
         }
-        
+
     }
 }
 
-void chasePacman(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int maze[HEIGHT][WIDTH],int* speedCounter) {
+void chasePacman(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int** maze, int* speedCounter, int ghostSpeed, int HEIGHT, int WIDTH) {
     if (*speedCounter == ghostSpeed) {
         int finalPath[VAMR][2];
         int FPn = 0;
-        applyBFS(pacmanX_, pacmanY_, ghostX, ghostY, maze, finalPath, &FPn);
+        applyBFS(pacmanX_, pacmanY_, ghostX, ghostY, maze, finalPath, &FPn, HEIGHT, WIDTH);
         *ghostX = finalPath[0][0];
         *ghostY = finalPath[0][1];
         //printf("\nchasePacman chala");
@@ -543,20 +504,20 @@ void chasePacman(int pacmanX_, int pacmanY_, int* ghostX, int* ghostY, int maze[
     else {
         *speedCounter += 1;
     }
-    
+
 
 }
 
 // ghost movement control
 
 
-void ghostMovement() {
+void ghostMovement(int NUMOFGHOSTS, int maxdistacnetochase, int pacmanX, int pacmanY, int ghostSpeed, int HEIGHT, int WIDTH, int** maze) {
     for (int i = 0;i < NUMOFGHOSTS;i++) {
         if (distanceBetweenTwoPoints(pacmanX, pacmanY, ghostsX[i], ghostsY[i]) > maxdistacnetochase) {
-            moveGhostRandomly(&ghostsX[i], &ghostsY[i], &gdxarr[i], &gdyarr[i], &ghostSpeedCounterarr[i]);
+            moveGhostRandomly(&ghostsX[i], &ghostsY[i], &gdxarr[i], &gdyarr[i], &ghostSpeedCounterarr[i], ghostSpeed, HEIGHT, WIDTH, maze);
         }
         else {
-            chasePacman(pacmanX, pacmanY, &ghostsX[i], &ghostsY[i], maze, &ghostSpeedCounterarr[i]);
+            chasePacman(pacmanX, pacmanY, &ghostsX[i], &ghostsY[i], maze, &ghostSpeedCounterarr[i], ghostSpeed, HEIGHT, WIDTH);
         }
     }
     //printf("%d", maxdistacnetochase);
@@ -565,13 +526,17 @@ void ghostMovement() {
 
 // collision 
 
-int isCollided() {
+int isCollided(int NUMOFGHOSTS, int pacmanX, int pacmanY, int points) {
     for (int i = 0;i < NUMOFGHOSTS;i++) {
         if (ghostsX[i] == pacmanX && ghostsY[i] == pacmanY) {
             printf("\n%d", points);
             printf("\nGAME OVER");
+            screenNumber = -1;
             return 1;
         }
     }
     return 0;
 }
+
+
+

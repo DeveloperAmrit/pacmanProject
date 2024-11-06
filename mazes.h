@@ -59,4 +59,14 @@ extern int maze6ghostsY[MAZE6_N_GHOSTS];
 extern int maze6[HEIGHT6][WIDTH6];
 
 
+// generalised
+
+extern int* maps[];
+extern int mapsRows[];
+extern int mapsCols[];
+extern int* mapsAllGhostsX[];
+extern int* mapsAllGhostsY[];
+extern int mapsNumOfGhosts[];
+extern int mapsPacmanStartX[];
+extern int mapsPacmanStartY[];
 #endif  // MAZES_H
