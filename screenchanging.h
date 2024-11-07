@@ -6,5 +6,5 @@ extern int screenNumber;
 
 int welcomescreen();
 int mainGame(int mapNumber);
-
+int selectMap();
 #endif

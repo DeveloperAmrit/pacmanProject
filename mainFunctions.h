@@ -8,7 +8,7 @@ extern int ghostsY[];
 extern int ghostSpeedCounterarr[];
 extern int gdxarr[];
 extern int gdyarr[];
-extern int isHighScore;
+
 
 
 // generalized functions

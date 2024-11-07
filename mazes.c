@@ -89,7 +89,7 @@ int maze5[HEIGHT5][WIDTH5] = {
     {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 };
-int maze5ghostsX[MAZE5_N_GHOSTS] = { 1,23,1,23,12 };
+int maze5ghostsX[MAZE5_N_GHOSTS] = { 1,23,2,23,12 };
 int maze5ghostsY[MAZE5_N_GHOSTS] = { 1,1,18,18,1 };
 
 

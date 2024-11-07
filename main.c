@@ -11,7 +11,11 @@
 
 int main(int argc, char* argv[])
 {   
-    int mapNumber = 5;
+    SDL_Init(SDL_INIT_EVERYTHING);
+    IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+    TTF_Init();
+
+    int mapNumber = 0;
     int score = -1;
     while (screenNumber != -1) {
         switch (screenNumber) {
@@ -19,9 +23,7 @@ int main(int argc, char* argv[])
             screenNumber = welcomescreen();
             break;
         case 1:
-            //mapNumber =  selectMap();
-            printf("In Contruction");
-            screenNumber = -1;
+            mapNumber =  selectMap();
             break;
         case 2:
             score = mainGame(mapNumber);
@@ -38,4 +40,8 @@ int main(int argc, char* argv[])
             break;
         }
     }
+
+    TTF_Quit();
+    IMG_Quit();
+    SDL_Quit();
 }

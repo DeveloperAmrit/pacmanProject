@@ -16,8 +16,6 @@ int gdxarr[6];
 int gdyarr[6];
 int ghostSpeedCounterarr[6];
 
-int isHighScore = 0;
-
 // generalised functions
 
 void renderTexture(SDL_Renderer* renderer, int x, int y, SDL_Texture* Texture, int angle, int TILE_SIZE)
@@ -139,7 +137,7 @@ void calculatePoint(int** maze, int WIDTH, int pacmanX, int pacmanY, int* points
 // rendering
 
 void showPoint(SDL_Renderer* renderer, int score, int x, int y) {
-    TTF_Font* textFont = TTF_OpenFont("Roboto-Regular.ttf", 16);
+    TTF_Font* textFont = TTF_OpenFont("./assets/Roboto-Regular.ttf", 16);
     SDL_Color fontColor = { 255,255,255,255 };
     char scoreText[20];
     snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
@@ -533,7 +531,7 @@ int isCollided(int NUMOFGHOSTS, int pacmanX, int pacmanY, int points) {
         if (ghostsX[i] == pacmanX && ghostsY[i] == pacmanY) {
             printf("\n%d", points);
             printf("\nGAME OVER");
-            screenNumber = -1;
+            screenNumber = 0;
             return 1;
         }
     }
