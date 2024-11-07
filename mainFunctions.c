@@ -16,6 +16,8 @@ int gdxarr[6];
 int gdyarr[6];
 int ghostSpeedCounterarr[6];
 
+int isHighScore = 0;
+
 // generalised functions
 
 void renderTexture(SDL_Renderer* renderer, int x, int y, SDL_Texture* Texture, int angle, int TILE_SIZE)
