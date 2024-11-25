@@ -11,6 +11,9 @@
 #include "screenchanging.h"
 
 int screenNumber = 0;
+int isHighScore = 0;
+int score = -1;
+int numberOfMaps = 6;
 
 int mainGame(int mapNumber) {
 
@@ -58,7 +61,7 @@ int mainGame(int mapNumber) {
 
     // ghosts
     #define ghostSpeed 10
-    int _tempmaxdtc_ = HEIGHT * WIDTH / 130;
+    int _tempmaxdtc_ = HEIGHT * WIDTH / 90;
     const int maxdistacnetochase = (_tempmaxdtc_ < 2) ? 2 : _tempmaxdtc_;
 
     // window
@@ -76,7 +79,7 @@ int mainGame(int mapNumber) {
 
 
 
-    SDL_Window* window = SDL_CreateWindow("PacmanMaze", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow("Pacman", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_SHOWN);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, 1, SDL_RENDERER_ACCELERATED);
 
     // loading media
@@ -182,9 +185,10 @@ int mainGame(int mapNumber) {
         renderPacman(renderer, pacmanOMTexture, pacmanCMTexture,TILE_SIZE,pacmanX,pacmanY,dx,dy,timeCounter);
         renderGhosts(renderer, ghoststextures, NUMOFGHOSTS,TILE_SIZE,NUMOFGHOSTS);
         calculatePoint(maze,WIDTH,pacmanX,pacmanY,&score);
-        showPoint(renderer, score, 10, HEIGHT * TILE_SIZE);
+        showPoint(renderer, score, 10, HEIGHT * TILE_SIZE,16);
         SDL_RenderPresent(renderer);
         if (isCollided(NUMOFGHOSTS,pacmanX,pacmanY,score)) {
+            fisHighScore("highScore.txt", score, &isHighScore, mapNumber);
             break;
         }
         SDL_Delay(16);
@@ -336,7 +340,7 @@ int welcomescreen() {
 int selectMap() {
     int SCREEN_WIDTH = 800;
     int SCREEN_HEIGHT = 600;
-    SDL_Window* window = SDL_CreateWindow("./assets/Pacman", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow("Pacman", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, 1, SDL_RENDERER_ACCELERATED);
 
 
@@ -371,14 +375,14 @@ int selectMap() {
 
     SDL_Texture* mapbtnTextures[] = {mapbtn1, mapbtn2, mapbtn3, mapbtn4, mapbtn5, mapbtn6};
 
-    int BUTTON_WIDTH = 100;
-    int BUTTON_HEIGHT = 100;
+    int BUTTON_WIDTH = 150;
+    int BUTTON_HEIGHT = 150;
     int BUTTON_GAP_X = (SCREEN_WIDTH - 3 * BUTTON_WIDTH) / 4;
     int BUTTON_GAP_Y = (SCREEN_HEIGHT - 2 * BUTTON_HEIGHT) / 3;
 
     // change here if changing number of maps
     SDL_Rect rect[6];
-    for (int i = 0;i < 6;i++) {                                  
+    for (int i = 0;i < 6;i++) {
         rect[i].x = (i%3)*BUTTON_WIDTH + (i%3+1)*BUTTON_GAP_X;
         rect[i].y = (i/3)*BUTTON_HEIGHT + (i/3+1) * BUTTON_GAP_Y;
         rect[i].w = BUTTON_WIDTH;
@@ -432,3 +436,57 @@ int selectMap() {
     SDL_DestroyWindow(window);
     return 0;
 }   
+
+int gameOver(int score_, int isHighScore_) {
+    int SCREEN_WIDTH = 800;
+    int SCREEN_HEIGHT = 600;
+    SDL_Window* window = SDL_CreateWindow("Pacman", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, 1, SDL_RENDERER_ACCELERATED);
+
+    SDL_Surface* gos = (isHighScore_) ? IMG_Load("./assets/gameOver2.jpg") : IMG_Load("./assets/gameOver1.png");
+    SDL_Texture* go = SDL_CreateTextureFromSurface(renderer, gos);
+    SDL_FreeSurface(gos);
+
+    SDL_Surface* homes = IMG_Load("./assets/home.png");
+    SDL_Texture* home = SDL_CreateTextureFromSurface(renderer, homes);
+    SDL_FreeSurface(homes);
+
+    int IMG_WIDTH =  300;
+    int IMG_HEIGHT = 100;
+    SDL_Rect rect = { SCREEN_WIDTH / 2 - IMG_WIDTH / 2,SCREEN_HEIGHT / 2 - IMG_HEIGHT,IMG_WIDTH,IMG_HEIGHT };
+
+    int HOME_WIDTH = 250;
+    int HOME_HEIGHT = 50;
+    SDL_Rect homerect = { SCREEN_WIDTH / 2 - HOME_WIDTH / 2,SCREEN_HEIGHT - HOME_HEIGHT - 10,HOME_WIDTH,HOME_HEIGHT };
+
+    SDL_Event event;
+    int running = 1;
+    while (running) {
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
+                screenNumber = -1;
+                running = 0;
+            }
+            else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+                int x = event.button.x;
+                int y = event.button.y;
+                if (x > homerect.x && x < homerect.x + homerect.w && y > homerect.y && y < homerect.y + homerect.h) {
+                    SDL_DestroyRenderer(renderer);
+                    SDL_DestroyWindow(window);
+                    screenNumber = 0;
+                    return 0;
+                }
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        (isHighScore_)? SDL_RenderCopy(renderer, go, NULL, NULL) : SDL_RenderCopy(renderer, go, NULL, &rect);
+        SDL_RenderCopy(renderer, home, NULL, &homerect);
+        showPoint(renderer,score_,SCREEN_WIDTH/2-50,SCREEN_WIDTH/2+6,24);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(16);
+    }
+    return 0;
+}

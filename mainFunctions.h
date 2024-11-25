@@ -19,9 +19,10 @@ void randomItemPlacer(int total, int value, int* restrictedValues, int lengthOfr
 
 //point calculation
 void calculatePoint(int** maze, int WIDTH, int pacmanX, int pacmanY, int* points);
+void fisHighScore(char path[], int score, int* isHighScore, int mapNumber);
 
 //rendering
-void showPoint(SDL_Renderer* renderer, int score, int x, int y);
+void showPoint(SDL_Renderer* renderer, int score, int x, int y,int fontSize);
 void renderMaze(SDL_Renderer* renderer, SDL_Texture* cherryTexture, int TILE_SIZE, int WIDTH, int HEIGHT, int** maze, int SMALL_DOT_RADIUS, SDL_Color dotColor);
 void renderPacman(SDL_Renderer* renderer, SDL_Texture* pacmanOMTexture, SDL_Texture* pacmanCMTexture, int TILE_SIZE, int pacmanX, int pacmanY, int dx, int dy, int timeCounter);
 void renderGhosts(SDL_Renderer* renderer, SDL_Texture** arrayOfTextures, int total, int TILE_SIZE, int NUMOFGHOSTS);

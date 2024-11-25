@@ -134,10 +134,41 @@ void calculatePoint(int** maze, int WIDTH, int pacmanX, int pacmanY, int* points
     }
 }
 
+// isHighScore checking 
+
+void fisHighScore(char path[], int score, int* isHighScore,int mapNumber) {
+
+    // if changing number of Maps change here
+    int highScoresArr[6];
+
+    FILE* file = fopen(path, "r");
+
+    // if changing number of Maps change here
+    for (int i = 0;i < 6;i++) {
+        char line[256];
+        fgets(line, sizeof(line), file);
+        highScoresArr[i] = atoi(line);
+    }
+    fclose(file);
+
+    int highScore = highScoresArr[mapNumber];
+
+    *isHighScore = (score > highScore);
+
+    if (*isHighScore) {
+        FILE* file2 = fopen(path, "w");
+        highScoresArr[mapNumber] = score;
+        for (int i = 0;i < 6;i++) {
+            fprintf(file2, "%d\n", highScoresArr[i]);
+        }
+        fclose(file2);
+    }
+}
+
 // rendering
 
-void showPoint(SDL_Renderer* renderer, int score, int x, int y) {
-    TTF_Font* textFont = TTF_OpenFont("./assets/Roboto-Regular.ttf", 16);
+void showPoint(SDL_Renderer* renderer, int score, int x, int y,int fontSize) {
+    TTF_Font* textFont = TTF_OpenFont("./assets/Roboto-Regular.ttf", fontSize);
     SDL_Color fontColor = { 255,255,255,255 };
     char scoreText[20];
     snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
@@ -529,14 +560,13 @@ void ghostMovement(int NUMOFGHOSTS, int maxdistacnetochase, int pacmanX, int pac
 int isCollided(int NUMOFGHOSTS, int pacmanX, int pacmanY, int points) {
     for (int i = 0;i < NUMOFGHOSTS;i++) {
         if (ghostsX[i] == pacmanX && ghostsY[i] == pacmanY) {
-            printf("\n%d", points);
-            printf("\nGAME OVER");
-            screenNumber = 0;
+            screenNumber = 3;
             return 1;
         }
     }
     return 0;
 }
+
 
 
 

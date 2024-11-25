@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     TTF_Init();
 
     int mapNumber = 0;
-    int score = -1;
+
     while (screenNumber != -1) {
         switch (screenNumber) {
         case 0:
@@ -29,9 +29,7 @@ int main(int argc, char* argv[])
             score = mainGame(mapNumber);
             break;
         case 3:
-            //gameOver(score);
-            printf("In Contruction");
-            screenNumber = -1;
+            gameOver(score,isHighScore);
             break;
         case 4:
             // showHighScore();
